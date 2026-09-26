@@ -1,0 +1,35 @@
+{
+  "name": "gerry",
+  "version": "0.1.0",
+  "description": "Session memory and context guard for Claude Code: HANDOFF.md briefing at zero model tokens, context alerts only when needed, compact handoffs.",
+  "author": { "name": "Nazario De Letteriis" },
+  "repository": "https://github.com/Nazariodeletteriis/gerry-token-saver",
+  "license": "MIT",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language code for replies and HANDOFF.md (e.g. it, en), or auto to follow the conversation.",
+      "default": "auto"
+    },
+    "context_window": {
+      "type": "string",
+      "title": "Context window",
+      "description": "auto = 1M if your model setting has [1m], otherwise 200k.",
+      "options": ["auto", "200000", "1000000"],
+      "default": "auto"
+    },
+    "graphify": {
+      "type": "string",
+      "title": "graphify",
+      "description": "off, suggest a knowledge graph on large projects, or ask Claude to build it automatically.",
+      "options": ["off", "suggest", "auto"],
+      "default": "suggest"
+    },
+    "obsidian_vault": {
+      "type": "directory",
+      "title": "Obsidian vault",
+      "description": "Copy HANDOFF.md and the graph into <vault>/<project>/. Leave empty to disable."
+    }
+  }
+}
