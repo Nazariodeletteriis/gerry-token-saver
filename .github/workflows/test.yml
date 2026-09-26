@@ -18,8 +18,10 @@ jobs:
         if: always() && runner.os == 'Windows'
         shell: bash
         run: |
-          for p in "path with spaces" "graphify failure" "missing from PATH" "graphify off" "obsidian copies" "missing vault" "held lock"; do
-            node --test --test-name-pattern "$p" tests/sync.test.js > out.txt 2>&1; echo "== [$p] exit=$?"; grep -E "^(not )?ok|# (pass|fail)" out.txt | head -3
+          set +e +o pipefail
+          node -v
+          node --test --test-name-pattern "obsidian copies" tests/sync.test.js > out.txt 2>&1; echo "== obsidian test exit=$?"; grep -vE "^ +(duration_ms|type|\.\.\.|---)|# SKIP" out.txt | tail -15
+          for n in "My Project e" "My Project è" "è" "Ω" "ascii"; do
+            N="$n" node -e "const fs=require('fs'),p=require('path'),os=require('os');const r=fs.mkdtempSync(p.join(os.tmpdir(),'cp-'));const s=p.join(r,process.env.N,'go','obs');fs.mkdirSync(s,{recursive:true});fs.writeFileSync(p.join(s,'Node.md'),'x');const d=p.join(r,'Memory',process.env.N);fs.mkdirSync(d,{recursive:true});fs.cpSync(s,p.join(d,'graph'),{recursive:true});console.log('copied',fs.readdirSync(p.join(d,'graph')))" 2>&1 | tail -5
+            echo "== cpSync [$n] exit=${PIPESTATUS[0]}"
           done
-          echo "== direct run"; node tests/sync.test.js 2>&1 | grep -vE "^ +(duration_ms|type|\.\.\.|---)" | tail -30; echo "exit=${PIPESTATUS[0]}"
-          node -e "const fs=require('fs'),p=require('path'),os=require('os');for(const n of ['ascii dir','My Project è']){const r=fs.mkdtempSync(p.join(os.tmpdir(),'cp-'));const s=p.join(r,n,'src');fs.mkdirSync(s,{recursive:true});fs.writeFileSync(p.join(s,'a.md'),'x');console.log('cpSync start',n);fs.cpSync(s,p.join(r,n,'dst'),{recursive:true});console.log('cpSync ok',n)}"; echo "cpSync probe exit=$?"
