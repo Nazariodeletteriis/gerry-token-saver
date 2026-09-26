@@ -233,10 +233,10 @@ Fonti: code.claude.com/docs/en/hooks.md, plugins-reference.
 
 ### Ancora da verificare durante la costruzione
 
-1. `SessionEnd` scatta chiudendo la tab in VSCode? **Non bloccante**: il recupero al SessionStart copre il caso negativo.
-2. `systemMessage` di uno Stop hook è visibile nel pannello VSCode (non solo nel terminale)? Se no, fallback: `terminalSequence` o notifica.
-3. `${user_config.language}` viene sostituito nel corpo dell'agente anche quando vale `auto`.
-4. `${CLAUDE_PLUGIN_DATA}` e `${user_config.*}` vengono sostituiti nel corpo del comando `/gerry:status`.
+1. `SessionEnd` scatta chiudendo la tab in VSCode? **Non bloccante**: il recupero al SessionStart copre il caso negativo. **Esito 2026-09-26:** non verificato (serve la chiusura di una tab VSCode vera); il recupero al SessionStart copre il caso.
+2. `systemMessage` di uno Stop hook è visibile nel pannello VSCode (non solo nel terminale)? Se no, fallback: `terminalSequence` o notifica. **Esito 2026-09-26 (smoke `claude -p` stream-json):** il `systemMessage` di Stop arriva al client come notifica `informational` ("Stop says: 📝 Gerry: …"); visibilità nel pannello VSCode: da verificare a mano da Nazario.
+3. `${user_config.language}` viene sostituito nel corpo dell'agente anche quando vale `auto`. **Esito 2026-09-26:** non verificabile con `--plugin-dir` (config non impostata; nei comandi un `${user_config.*}` non impostato resta letterale, vedi punto 4). Nella prova l'agente ha scritto in italiano seguendo il riassunto. Da verificare dopo l'installazione dal marketplace (T16).
+4. `${CLAUDE_PLUGIN_DATA}` e `${user_config.*}` vengono sostituiti nel corpo del comando `/gerry:status`. **Esito 2026-09-26 (smoke `claude -p "/gerry:status" --plugin-dir`):** `${CLAUDE_PLUGIN_DATA}` sostituito; `${user_config.context_window}` no (bash "bad substitution") → tolto dal comando, /gerry:status usa context_window=auto.
 
 ## 10. Modifiche emerse scrivendo il piano (2026-09-26)
 

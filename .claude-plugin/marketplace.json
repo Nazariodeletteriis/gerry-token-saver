@@ -1,0 +1,16 @@
+{
+  "name": "gerry-token-saver",
+  "owner": { "name": "Nazario De Letteriis" },
+  "plugins": [
+    {
+      "name": "gerry",
+      "source": "./plugins/gerry",
+      "description": "Session memory and context guard: HANDOFF.md briefing at zero model tokens, context alerts only when needed, compact handoffs."
+    },
+    {
+      "name": "ponytail",
+      "source": { "source": "github", "repo": "DietrichGebert/ponytail" },
+      "description": "Companion (upstream): forces the simplest code that works."
+    }
+  ]
+}
