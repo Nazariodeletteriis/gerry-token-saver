@@ -29,7 +29,8 @@
     "obsidian_vault": {
       "type": "directory",
       "title": "Obsidian vault",
-      "description": "Copy HANDOFF.md and the graph into <vault>/<project>/. Leave empty to disable."
+      "description": "Copy HANDOFF.md and the graph into <vault>/<project>/. Leave empty to disable.",
+      "default": ""
     }
   }
 }
