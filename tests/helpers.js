@@ -41,4 +41,14 @@ function runScript (name, input, env = {}) {
   return { out, raw: r.stdout, status: r.status }
 }
 
-module.exports = { SCRIPTS, tmp, writeTranscript, assistant, runScript }
+function fakeBin (dir, name, exitCode, stdout = '') {
+  if (process.platform === 'win32') {
+    fs.writeFileSync(path.join(dir, name + '.cmd'), `@echo off\r\necho ${stdout}\r\necho %*> "%~dp0${name}.args"\r\nexit /b ${exitCode}\r\n`)
+  } else {
+    const f = path.join(dir, name)
+    fs.writeFileSync(f, `#!/bin/sh\necho '${stdout}'\necho "$@" > "$(dirname "$0")/${name}.args"\nexit ${exitCode}\n`)
+    fs.chmodSync(f, 0o755)
+  }
+}
+
+module.exports = { SCRIPTS, tmp, writeTranscript, assistant, runScript, fakeBin }
