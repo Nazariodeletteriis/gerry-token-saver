@@ -186,12 +186,11 @@ Sistema nativo **`userConfig`** in `plugin.json`: Claude Code chiede i valori al
 | `language` | string | `auto` o codice lingua | `auto` |
 | `context_window` | string (options) | `auto`, `200000`, `1000000` | `auto` |
 | `graphify` | string (options) | `off`, `suggest`, `auto` | `suggest` |
-| `graphify_docs` | boolean | | `false` |
 | `obsidian_vault` | directory | percorso, vuoto = spento | vuoto |
 
 Fissi nel codice (diventano opzioni solo se richiesto): soglie 60% / 30%, limite 60 righe, cooldown 30 min, grafo "vecchio" = 7 giorni.
 
-Config di Nazario: `language=it`, `context_window=auto`, `graphify=auto`, `graphify_docs=true`, `obsidian_vault=/mnt/c/Users/nazar/.claude/projects/Memory`.
+Config di Nazario: `language=it`, `context_window=auto`, `graphify=auto`, `obsidian_vault=/mnt/c/Users/nazar/.claude/projects/Memory`.
 
 **Versione minima di Claude Code**: 2.1.271 (`options` in userConfig). Da dichiarare nel README.
 
@@ -237,3 +236,19 @@ Fonti: code.claude.com/docs/en/hooks.md, plugins-reference.
 1. `SessionEnd` scatta chiudendo la tab in VSCode? **Non bloccante**: il recupero al SessionStart copre il caso negativo.
 2. `systemMessage` di uno Stop hook è visibile nel pannello VSCode (non solo nel terminale)? Se no, fallback: `terminalSequence` o notifica.
 3. `${user_config.language}` viene sostituito nel corpo dell'agente anche quando vale `auto`.
+4. `${CLAUDE_PLUGIN_DATA}` e `${user_config.*}` vengono sostituiti nel corpo del comando `/gerry:status`.
+
+## 10. Modifiche emerse scrivendo il piano (2026-09-26)
+
+Prevalgono sulle sezioni sopra dove le contraddicono.
+
+- **CLI di graphify**: esiste solo `graphify update <path>` (solo codice, nessun LLM). Prima costruzione e documenti passano dalla skill `/graphify`, che usa il modello. Quindi:
+  - `sync.js` lancia `graphify update .` solo se esiste `graphify-out/graph.json`;
+  - opzione **`graphify_docs` eliminata**;
+  - `graphify=auto` = il briefing chiede a Claude di lanciare `/graphify .` (una volta per progetto); `suggest` = Claude lo propone all'utente.
+- **Controllo "grafo vecchio" eliminato**: `graphify update` gira a ogni sessione, quindi un grafo fermo si vede come "sync fallito" nel log.
+- **Vault Obsidian mancante**: segnalato tramite il log del sync (avviso dalla sessione successiva), non con un controllo separato.
+- **Avvisi di salute**: vanno a Claude (`additionalContext`) con l'istruzione di riferirli all'utente; nessun `systemMessage` a inizio sessione.
+- **Consiglio Headroom**: fuori dal piano v1, si decide dopo la prova (29/09).
+- **Progetto grande** = almeno 20 file (visita limitata, salta `node_modules`, cartelle nascoste, build); il criterio delle 2.000 righe cade.
+- **`/gerry:status`**: consumo sessione calcolato dal transcript; oggi e 7 giorni da `ccusage daily --json` (binario se presente, altrimenti `npx -y ccusage@latest`).
