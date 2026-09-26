@@ -17,7 +17,7 @@ const FIX = {
 
 function handoffBlock (dir) {
   let lines
-  try { lines = fs.readFileSync(path.join(dir, 'HANDOFF.md'), 'utf8').split(/\r?\n/) } catch { return { text: '', lines: 0 } }
+  try { lines = fs.readFileSync(path.join(dir, 'HANDOFF.md'), 'utf8').replace(/\r?\n$/, '').split(/\r?\n/) } catch { return { text: '', lines: 0 } }
   const extra = lines.length - MAX_HANDOFF
   const note = extra > 0 ? `\n[... ${extra} more lines: HANDOFF.md will be compacted at the next session-end]` : ''
   return { text: `## HANDOFF.md (${dir})\n${lines.slice(0, MAX_HANDOFF).join('\n')}${note}`, lines: lines.length }
@@ -106,7 +106,7 @@ function briefing (input) {
 
 function startSync (dir) {
   if (process.env.GERRY_NO_SYNC) return
-  spawn(process.execPath, [path.join(__dirname, 'sync.js'), dir], { detached: true, stdio: 'ignore' }).unref()
+  spawn(process.execPath, [path.join(__dirname, 'sync.js'), dir], { detached: true, stdio: 'ignore', windowsHide: true }).unref()
 }
 
 function main (input) {

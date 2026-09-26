@@ -7,11 +7,12 @@ const WARN_USED = 60
 const CRITICAL_REMAINING = 30
 const COMPACT_BUFFER = 10
 
-function contextWindow (opt, settingsFile) {
+function contextWindow (opt, settingsFile, tokens = 0) {
   if (process.env.GERRY_CTX_LIMIT) return Number(process.env.GERRY_CTX_LIMIT)
   if (opt === '200000' || opt === '1000000') return Number(opt)
   const model = String(io.readJson(settingsFile, {}).model || '')
-  return model.includes('[1m]') ? 1000000 : 200000
+  const envModel = String(process.env.ANTHROPIC_MODEL || '')
+  return (model.includes('[1m]') || envModel.includes('[1m]') || tokens > 200000) ? 1000000 : 200000
 }
 
 function usage (tokens, window) {
@@ -30,7 +31,7 @@ function main (input) {
   if (!input.transcript_path) return
   const tokens = contextTokens(tailRecords(input.transcript_path, 512 * 1024))
   if (tokens === null) return
-  const u = usage(tokens, contextWindow(io.option('context_window', 'auto'), io.settingsPath()))
+  const u = usage(tokens, contextWindow(io.option('context_window', 'auto'), io.settingsPath(), tokens))
   const file = path.join(io.dataDir(), 'sessions', `${input.session_id || 'default'}.json`)
   const state = io.readJson(file, {})
   const level = decide(u, state)

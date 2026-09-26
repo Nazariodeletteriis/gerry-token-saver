@@ -103,3 +103,19 @@ test('hook with nothing to say emits nothing', () => {
   assert.strictEqual(r.status, 0)
   assert.strictEqual(r.raw, '')
 })
+
+test('handoffBlock with exactly 60 lines and trailing newline has no "more lines" note', () => {
+  const d = tmp()
+  fs.writeFileSync(path.join(d, 'HANDOFF.md'), Array.from({ length: 60 }, (_, i) => `line ${i + 1}`).join('\n') + '\n')
+  const h = ss.handoffBlock(d)
+  assert.strictEqual(h.lines, 60)
+  assert.doesNotMatch(h.text, /more lines/)
+})
+
+test('handoffBlock with exactly 60 lines and trailing CRLF has no "more lines" note', () => {
+  const d = tmp()
+  fs.writeFileSync(path.join(d, 'HANDOFF.md'), Array.from({ length: 60 }, (_, i) => `line ${i + 1}`).join('\r\n') + '\r\n')
+  const h = ss.handoffBlock(d)
+  assert.strictEqual(h.lines, 60)
+  assert.doesNotMatch(h.text, /more lines/)
+})

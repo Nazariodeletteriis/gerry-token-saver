@@ -65,7 +65,7 @@ function main () {
   const daily = ccusageDaily()
   console.log(formatStatus({
     dir,
-    ctx: tokens === null ? null : usage(tokens, contextWindow(io.option('context_window', 'auto'), io.settingsPath())),
+    ctx: tokens === null ? null : usage(tokens, contextWindow(io.option('context_window', 'auto'), io.settingsPath(), tokens)),
     sessionTokens: sessionTokens(recs),
     usage: daily ? summarize(daily, ymd(new Date())) : null,
     companions: detect(io.readJson(io.settingsPath(), {})),

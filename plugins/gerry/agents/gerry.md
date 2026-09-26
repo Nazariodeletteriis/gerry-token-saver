@@ -24,7 +24,9 @@ Language: ${user_config.language}. If that is "auto", write in the language of t
    ## Key files           (max 6)
    ## Watch out           (pitfalls, urgent notes)
 
-3. Before writing, walk the ORIGINAL HANDOFF.md top to bottom, line by line — not just its `## ` sections. Any line not carried into the new HANDOFF.md (finished tasks, superseded decisions, old session notes, and stray lines that sit between sections with no heading of their own) goes to the END of `<dir>/HANDOFF-archive.md` under a translated `## Archived <YYYY-MM-DD>` heading. Headingless lines are the easiest to drop by accident — e.g. a one-off fact like a final app id, a leftover secrets backup file on a server, or a test name — so check for them explicitly. Create the archive file if missing. Never drop information: it stays in HANDOFF.md or goes to the archive.
+   Decisions and tasks still open in the original stay in HANDOFF.md under "Open decisions" / "Next step" — compress them, never move them to the archive.
+
+3. Before writing, walk the ORIGINAL HANDOFF.md top to bottom, line by line — not just its `## ` sections. Any line not carried into the new HANDOFF.md (finished tasks, superseded decisions, old session notes, and stray lines that sit between sections with no heading of their own) goes to the END of `<dir>/HANDOFF-archive.md` under a translated `## Archived <YYYY-MM-DD>` heading. Headingless lines are the easiest to drop by accident — e.g. a one-off fact like a final app id, a leftover secrets backup file on a server, or a test name — so check for them explicitly. Create the archive file if missing. Never drop information: it stays in HANDOFF.md or goes to the archive. Append without rewriting: Read only the last lines of the archive (offset near its end) and add the new block after its last line with Edit; use Write only to create it.
 4. Reply in at most 3 lines: path saved, final line count, what went to the archive.
 
 Keep facts, paths, commands and decisions verbatim; cut narration. Touch no other file.

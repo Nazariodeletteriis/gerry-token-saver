@@ -31,7 +31,7 @@ function detect (settings) {
 
 function runCmd (cmd, args, cwd, timeout) {
   const win = process.platform === 'win32' // .cmd shims need a shell; quote the path in case it has spaces
-  const r = spawnSync(win ? `"${cmd}"` : cmd, args, { cwd, timeout, encoding: 'utf8', shell: win })
+  const r = spawnSync(win ? `"${cmd}"` : cmd, args, { cwd, timeout, encoding: 'utf8', shell: win, windowsHide: true })
   return { ok: r.status === 0, out: r.stdout || '', err: String(r.stderr || (r.error && r.error.message) || '').trim() }
 }
 

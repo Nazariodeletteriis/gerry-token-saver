@@ -22,6 +22,7 @@ test('decide fires each threshold once, critical wins', () => {
 })
 
 test('contextWindow: option, then [1m] in settings, then 200k', () => {
+  delete process.env.ANTHROPIC_MODEL
   const d = tmp()
   const s = path.join(d, 'settings.json')
   fs.writeFileSync(s, JSON.stringify({ model: 'opus[1m]' }))
@@ -74,4 +75,35 @@ test('missing transcript exits 0 with no output', () => {
   const r = runScript('context.js', { session_id: 's4', transcript_path: path.join(d, 'nope.jsonl') }, env(d))
   assert.strictEqual(r.status, 0)
   assert.strictEqual(r.raw, '')
+})
+
+test('contextWindow with tokens > 200000 returns 1000000 in auto mode', () => {
+  const d = tmp()
+  const s = path.join(d, 'settings.json')
+  delete process.env.ANTHROPIC_MODEL
+  fs.writeFileSync(s, JSON.stringify({ model: 'sonnet' }))
+  assert.strictEqual(c.contextWindow('auto', s, 250000), 1000000)
+})
+
+test('contextWindow with tokens ≤ 200000 returns 200000 in auto mode with sonnet model', () => {
+  const d = tmp()
+  const s = path.join(d, 'settings.json')
+  delete process.env.ANTHROPIC_MODEL
+  fs.writeFileSync(s, JSON.stringify({ model: 'sonnet' }))
+  assert.strictEqual(c.contextWindow('auto', s, 150000), 200000)
+  assert.strictEqual(c.contextWindow('auto', s, 0), 200000)
+})
+
+test('contextWindow with ANTHROPIC_MODEL containing [1m] returns 1000000 in auto mode', () => {
+  const d = tmp()
+  const s = path.join(d, 'settings.json')
+  const original = process.env.ANTHROPIC_MODEL
+  try {
+    process.env.ANTHROPIC_MODEL = 'opus[1m]'
+    fs.writeFileSync(s, JSON.stringify({ model: 'sonnet' }))
+    assert.strictEqual(c.contextWindow('auto', s), 1000000)
+  } finally {
+    if (original) process.env.ANTHROPIC_MODEL = original
+    else delete process.env.ANTHROPIC_MODEL
+  }
 })
