@@ -3,6 +3,7 @@ on: [push, pull_request]
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         node: [18, 22]
@@ -13,3 +14,12 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node --test
+      - name: diag sync (temporary)
+        if: always() && runner.os == 'Windows'
+        shell: bash
+        run: |
+          for p in "path with spaces" "graphify failure" "missing from PATH" "graphify off" "obsidian copies" "missing vault" "held lock"; do
+            node --test --test-name-pattern "$p" tests/sync.test.js > out.txt 2>&1; echo "== [$p] exit=$?"; grep -E "^(not )?ok|# (pass|fail)" out.txt | head -3
+          done
+          echo "== direct run"; node tests/sync.test.js 2>&1 | grep -vE "^ +(duration_ms|type|\.\.\.|---)" | tail -30; echo "exit=${PIPESTATUS[0]}"
+          node -e "const fs=require('fs'),p=require('path'),os=require('os');for(const n of ['ascii dir','My Project è']){const r=fs.mkdtempSync(p.join(os.tmpdir(),'cp-'));const s=p.join(r,n,'src');fs.mkdirSync(s,{recursive:true});fs.writeFileSync(p.join(s,'a.md'),'x');console.log('cpSync start',n);fs.cpSync(s,p.join(r,n,'dst'),{recursive:true});console.log('cpSync ok',n)}"; echo "cpSync probe exit=$?"
