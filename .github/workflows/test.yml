@@ -14,14 +14,3 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node --test
-      - name: diag sync (temporary)
-        if: always() && runner.os == 'Windows'
-        shell: bash
-        run: |
-          set +e +o pipefail
-          node -v
-          node --test --test-name-pattern "obsidian copies" tests/sync.test.js > out.txt 2>&1; echo "== obsidian test exit=$?"; grep -vE "^ +(duration_ms|type|\.\.\.|---)|# SKIP" out.txt | tail -15
-          for n in "My Project e" "My Project è" "è" "Ω" "ascii"; do
-            N="$n" node -e "const fs=require('fs'),p=require('path'),os=require('os');const r=fs.mkdtempSync(p.join(os.tmpdir(),'cp-'));const s=p.join(r,process.env.N,'go','obs');fs.mkdirSync(s,{recursive:true});fs.writeFileSync(p.join(s,'Node.md'),'x');const d=p.join(r,'Memory',process.env.N);fs.mkdirSync(d,{recursive:true});fs.cpSync(s,p.join(d,'graph'),{recursive:true});console.log('copied',fs.readdirSync(p.join(d,'graph')))" 2>&1 | tail -5
-            echo "== cpSync [$n] exit=${PIPESTATUS[0]}"
-          done

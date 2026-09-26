@@ -60,6 +60,15 @@ function syncGraph (dir) {
   return { ok: r.ok, msg: r.ok ? 'updated' : r.err.slice(0, 300) || 'graphify update failed' }
 }
 
+// Not fs.cpSync: Node 22's native cpSync aborts the process (0xC0000409) on Windows with non-ASCII paths
+function copyDir (src, dst) {
+  fs.mkdirSync(dst, { recursive: true })
+  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+    if (e.isDirectory()) copyDir(path.join(src, e.name), path.join(dst, e.name))
+    else if (e.isFile()) fs.copyFileSync(path.join(src, e.name), path.join(dst, e.name))
+  }
+}
+
 function syncObsidian (dir, vault) {
   if (!vault) return null
   if (!fs.existsSync(vault)) return { ok: false, msg: `vault not found: ${vault}` }
@@ -72,7 +81,7 @@ function syncObsidian (dir, vault) {
   const report = path.join(dir, 'graphify-out', 'GRAPH_REPORT.md')
   if (newer(report, path.join(dest, 'graph', 'GRAPH_REPORT.md'))) {
     const obs = path.join(dir, 'graphify-out', 'obsidian')
-    if (fs.existsSync(obs)) fs.cpSync(obs, path.join(dest, 'graph'), { recursive: true })
+    if (fs.existsSync(obs)) copyDir(obs, path.join(dest, 'graph'))
     fs.mkdirSync(path.join(dest, 'graph'), { recursive: true })
     fs.copyFileSync(report, path.join(dest, 'graph', 'GRAPH_REPORT.md'))
   }
